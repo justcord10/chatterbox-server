@@ -38,19 +38,31 @@ var requestHandler = function(request, response) {
       request.on('end', function () {
         //JSON parse this body string
         var message = JSON.parse(bodyString);
+        //checking each property of message (.message, .room, .username)
+        if (typeof message.text === 'string' && typeof message.room === 'string' && typeof message.username === 'string') {
         //push onto the messages array
-        messages.push(message);
-        //set response headers (if problems might need to move this next section of code outside this on function call)
-        headers['Content-Type'] = 'application/json';
-        //write the headers to the heasd with the status code
-        response.writeHead(201, headers);
-        //send our status code back //might need to send something else back
-        response.end();
+          messages.push(message);
+          //set response headers (if problems might need to move this next section of code outside this on function call)
+          headers['Content-Type'] = 'application/json';
+          //write the headers to the heasd with the status code
+          response.writeHead(201, headers);
+          //send our status code back //might need to send something else back
+          response.end();
+        } else {
+          headers['Content-Type'] = 'application/json'; //might need to delete/adjust
+          response.writeHead(406, headers);
+          response.end('response end for invald message sent');
+        }
+
       });
-      //need to have another response end here?
-    //if method receive is not GET or POST
+
+      //if methods received is options
+    } else if (request.method === 'OPTIONS') {
+      headers['Allow'] = 'GET, POST, OPTIONS';
+      response.writeHead(200, headers);
+      response.end('response end for OPTIONS method sent');
     } else {
-      //
+      //if method receive is not GET or POST
       headers['Content-Type'] = 'application/json';
       //write the headers to the head with the status code
       response.writeHead(405, headers);

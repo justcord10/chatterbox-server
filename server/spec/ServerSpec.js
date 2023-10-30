@@ -39,7 +39,8 @@ describe('Node Server Request Listener Function', function() {
   it('Should accept posts to /classes/messages', function() {
     var stubMsg = {
       username: 'Jono',
-      text: 'Do my bidding!'
+      text: 'Do my bidding!',
+      room: 'pickles'
     };
     var req = new stubs.request('/classes/messages', 'POST', stubMsg);
     var res = new stubs.response();
@@ -55,10 +56,25 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+  it('should not post invlaid messages', function() {
+    var stubMsg = {
+      username: [],
+      text: 'Do my bidding!',
+      room: 'pickles'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+    expect(res._responseCode).to.equal(406);
+    expect(res._ended).to.equal(true);
+  });
+
   it('Should respond with messages that were previously posted', function() {
     var stubMsg = {
       username: 'Jono',
-      text: 'Do my bidding!'
+      text: 'Do my bidding!',
+      room: 'pickles'
     };
     var req = new stubs.request('/classes/messages', 'POST', stubMsg);
     var res = new stubs.response();
